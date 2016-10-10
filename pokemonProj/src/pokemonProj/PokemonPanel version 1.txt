@@ -1,0 +1,201 @@
+package pokemonProj;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class PokemonPanel extends JPanel{
+	
+	int size = 80, numOfPokemon = 11, z = 1, y, x;
+	int findEntry = 0;//points to selected pokemon entry number
+	static JFrame frame;
+	JComboBox list;
+	Icon[] picture = new ImageIcon[numOfPokemon];
+	JLabel[] picLabel = new JLabel[numOfPokemon];//this label holds graphical pictures
+	JLabel[] pName = new JLabel[numOfPokemon];//this label holds string names of pokemon
+	String[] names = new String[numOfPokemon];
+	String[] type1 = new String[numOfPokemon];
+	String[] type2 = new String[numOfPokemon];
+	int[] stats = new int[numOfPokemon];
+	
+	public PokemonPanel(){
+		
+
+		names[0]  = "-------";		type1[0]  = "n/a";		type2[0]  = "n/a";		picture[0]  = new ImageIcon(getClass().getResource("index.jpg"));
+		names[1]  = "Bulbasaur";	type1[1]  = "grass";	type2[1]  = "grass";	picture[1]  = new ImageIcon(getClass().getResource("Bulbasaur.jpg"));
+		names[2]  = "Ivysaur";		type1[2]  = "grass";	type2[2]  = "poison";	picture[2]  = new ImageIcon(getClass().getResource("Ivysaur.png"));
+		names[3]  = "Venusar";		type1[3]  = "grass";	type2[3]  = "poison";	picture[3]  = new ImageIcon(getClass().getResource("Venusaur.jpg"));
+		names[4]  = "Charmander";	type1[4]  = "fire";		type2[4]  = "fire";		picture[4]  = new ImageIcon(getClass().getResource("Charmander.png"));
+		names[5]  = "Charmeleon";	type1[5]  = "fire";		type2[5]  = "fire";		picture[5]  = new ImageIcon(getClass().getResource("Charmeleon.jpg"));
+		names[6]  = "Charizard";	type1[6]  = "fire";		type2[6]  = "flying";	picture[6]  = new ImageIcon(getClass().getResource("Charizard.png"));
+		names[7]  = "Squirtle";		type1[7]  = "water";	type2[7]  = "water";	picture[7]  = new ImageIcon(getClass().getResource("Squirtle.jpg"));
+		names[8]  = "Wartortle";	type1[8]  = "water";	type2[8]  = "water";	picture[8]  = new ImageIcon(getClass().getResource("Wartortle.png"));
+		names[9]  = "Blastoise";	type1[9]  = "water";	type2[9]  = "water";	picture[9]  = new ImageIcon(getClass().getResource("Blastoise.jpg"));
+		names[10] = "Caterpie";		type1[10] = "bug";		type2[10] = "grass";	picture[10] = new ImageIcon(getClass().getResource("Caterpie.jpg"));
+		
+		
+		for(int x = 0; x < numOfPokemon; x++){
+			picLabel[x] = new JLabel(picture[x]);
+		}//place all the pictures on to a JLabel
+		
+		list = new JComboBox(names);//stores Pokemons names and stats them in the drop box.
+		
+		for(int s = 0; s < numOfPokemon; s++){
+			pName[s] = new JLabel(names[s]);
+		}// assign each label a Pokemon name.
+		
+//		add(pName[1]);
+
+		Plistener listener = new Plistener();
+		list.addActionListener(listener);
+		list.setBounds(650, 30, 125, 20);
+	    setPreferredSize(new Dimension(1500,700));
+	    setBackground(Color.gray);
+	    add(list);//add the JComboBox
+	    picLabel[10].setBounds(700, 300, 300, 300);
+	    add(picLabel[10]);
+	}
+	
+	public void paintComponent(Graphics background){
+		super.paintComponent(background);	
+		background.setColor(Color.red);
+		background.drawLine(50, 50, 1000, 700);
+		background.drawOval(500, 500, 100, 100);
+		background.fillOval(300, 300, 200, 200);
+		background.fillRect(100, 100, 2001, 200);
+	}
+
+
+	public class Plistener implements ActionListener{
+		public void actionPerformed(ActionEvent e){
+			
+			String s = list.getSelectedItem().toString();//takes the string entry of the JComboBox
+			findEntry = 0;//always reset to 0 before searching for string in the array.
+			
+			for(int p = 0; p < numOfPokemon; p++){
+				stats[p] = 0;//always reset stats to 0 at the beginning of the action, before a new pokemon is picked.
+				remove(pName[p]);//always reset and remove label when starting new action.
+				remove(picLabel[p]);//always reset and remove the picture when starting a new action.
+			}
+			while(names[findEntry] != s){
+				findEntry++;
+			}//locate the array entry for that selected pokemon(the pokemon #No.).
+			
+			findPokemon(findEntry);//calculate the selected pokemon's type vs all the other pokemon. -2 <= 0 <= 2 points. stats[i] is result
+			
+//			add(picLabel[0]);
+//			picLabel[0].setBounds(20, 120, size, size);
+//			
+//			add(picLabel[10]);
+//			picLabel[10].setBounds(20 + 100, 120, size, size);
+			
+			
+			int j = 0;
+			int k = 0;
+			for(int i = 0; i < numOfPokemon; i++){
+				if(j % 5 == 0 && j !=0){
+					j = 0;
+					k++;
+				}//go to the next row and start from the most left column
+				if(stats[i] > 0){
+					System.out.println(names[findEntry] + " is good vs: " + names[i]);
+					add(pName[i]);
+					add(picLabel[i]);
+					pName[i].setBounds(20 + 100 * j, 200 + 130 * k, size, 20);
+					picLabel[i].setBounds(20 + 100 * j, 120 + 130 * k, size, size);
+					pName[i].setHorizontalAlignment(SwingConstants.CENTER);
+					j++;
+				}
+			}
+			
+			int j2 = 0;
+			int k2 = 0;
+			for(int i = 0; i < numOfPokemon; i++){
+				if(j2 % 5 == 0 && j2 !=0){
+					j2 = 0;
+					k2++;
+				}//go to the next row and start from the most left column
+				if(stats[i] < 0){
+					System.out.println(names[findEntry] + " is bad vs: " + names[i]);
+					add(pName[i]);
+					add(picLabel[i]);
+					pName[i].setBounds(950 + 100 * j2, 200 + 130 * k2, size, 20);
+					picLabel[i].setBounds(950 + 100 * j2, 120 + 130 * k2, size, size);
+					pName[i].setHorizontalAlignment(SwingConstants.CENTER);
+					j2++;
+				}
+			}
+			
+			System.out.println(s + " is entry number " + findEntry + " and is type: " + type1[findEntry] + "/" + type2[findEntry]);
+			repaint();
+		}
+	}
+	
+	public int[] findPokemon (int compare){
+		int pokemonNo = compare;
+		
+		if(type1[findEntry] == "fire"){
+			for(int a = 0; a < numOfPokemon; a++){
+				if(type1[a] == "grass" || type1[a] == "ice" || type1[a] == "bug" || type1[a] == "steel") stats[a]++;
+				else if(type1[a] == "fire" || type1[a] == "water" || type1[a] == "rock" || type1[a] == "dragon") stats[a]--;
+				else;
+			}
+		}
+		if(type2[findEntry] == "fire"){
+			for(int a = 0; a < numOfPokemon; a++){
+				if(type1[a] == "grass" || type1[a] == "ice" || type1[a] == "bug" || type1[a] == "steel") stats[a]++;
+				else if(type1[a] == "fire" || type1[a] == "water" || type1[a] == "rock" || type1[a] == "dragon") stats[a]--;
+				else;
+			}
+		}//finds fire type's strong against and weak against
+		
+		if(type1[findEntry] == "grass"){
+			for(int a = 0; a < numOfPokemon; a++){
+				if(type1[a] == "water" || type1[a] == "ground" || type1[a] == "rock") stats[a]++;
+				else if(type1[a] == "fire" || type1[a] == "ice" || type1[a] == "poison" || type1[a] == "flying" || type1[a] == "bug") stats[a]--;
+				else;
+			}
+		}
+		if(type2[findEntry] == "grass"){
+			for(int a = 0; a < numOfPokemon; a++){
+				if(type1[a] == "water" || type1[a] == "ground" || type1[a] == "rock") stats[a]++;
+				else if(type1[a] == "fire" || type1[a] == "ice" || type1[a] == "poison" || type1[a] == "flying" || type1[a] == "bug") stats[a]--;
+				else;
+			}
+		}//finds grass type's strong against and weak against
+		
+		if(type1[findEntry] == "poison"){
+			for(int a = 0; a < numOfPokemon; a++){
+				if(type1[a] == "grass" || type1[a] == "fairy") stats[a]++;
+				else if(type1[a] == "poison" || type1[a] == "ground" || type1[a] == "rock" || type1[a] == "ghost" || type1[a] == "steel") stats[a]--;
+				else;
+			}
+		}
+		if(type2[findEntry] == "poison"){
+			for(int a = 0; a < numOfPokemon; a++){
+				if(type1[a] == "grass" || type1[a] == "fairy") stats[a]++;
+				else if(type1[a] == "poison" || type1[a] == "ground" || type1[a] == "rock" || type1[a] == "ghost" || type1[a] == "steel") stats[a]--;
+				else;
+			}
+		}//finds poison type's strong against and weak against
+		
+		if(type1[findEntry] == "water"){
+			for(int a = 0; a < numOfPokemon; a++){
+				if(type1[a] == "fire" || type1[a] == "ground" || type1[a] == "rock") stats[a]++;
+				else if(type1[a] == "water" || type1[a] == "grass" || type1[a] == "dragon") stats[a]--;
+				else;
+			}
+		}
+		if(type1[findEntry] == "water"){
+			for(int a = 0; a < numOfPokemon; a++){
+				if(type1[a] == "fire" || type1[a] == "ground" || type1[a] == "rock") stats[a]++;
+				else if(type1[a] == "water" || type1[a] == "grass" || type1[a] == "dragon") stats[a]--;
+				else;
+			}
+		}//finds water type's strong against and weak against
+		
+		return stats;
+	}
+	
+	
+	
+}
