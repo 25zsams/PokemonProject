@@ -34,6 +34,10 @@ public class Type extends JPanel implements Comparable<Type>{
 			{ 1, 2, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 2, 2, 1 } // fairy
 	};
 
+	public String[] getTYPES(){
+		return TYPES;
+	}
+	
 	public Type(int a) {
 		this(a, DNE);
 	}
