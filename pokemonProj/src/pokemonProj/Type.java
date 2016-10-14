@@ -112,22 +112,42 @@ public class Type extends JPanel implements Comparable<Type>{
 	 * @return >0 if this is effective against other, 0 if neutral, <0 if this
 	 *         is ineffective against other.
 	 */
-	public int compareTo(Type other) {
+public int compareTo(Type other) {
 		int re = 0;
-
+		boolean thisTypeTwo = this.type2 != DNE ? true : false;
+		boolean otherTypeTwo = other.type2 != DNE ? true : false;
+		
+		
 		re += chart[this.type1][other.type1] - 1;
 
-		if(this.type2 != DNE)//if this has a 2nd type
-			re += chart[this.type2][other.type1]-1;
-		
-		if(other.type2 != DNE)//if other has a 2nd type
+		if (thisTypeTwo)// if this has a 2nd type
+			re += chart[this.type2][other.type1] - 1;
+
+		if (otherTypeTwo)// if other has a 2nd type
 		{
-			re += chart[this.type1][other.type2]-1;
-			if(this.type2 != DNE)//if this has a 2nd type and other has a 2nd type
-				re += chart[this.type2][other.type2]-1;
+			re += chart[this.type1][other.type2] - 1;
+			if (thisTypeTwo)// if this has a 2nd type and other has a 2nd
+									// type
+				re += chart[this.type2][other.type2] - 1;
+		}
+		
+		//comparing other against this
+		
+		re -= chart[other.type1][this.type1] + 1;
+
+		if (otherTypeTwo)// if this other a 2nd type
+			re -= chart[other.type2][this.type1] + 1;
+
+		if (thisTypeTwo)// if this has a 2nd type
+		{
+			re -= chart[other.type1][this.type2] + 1;
+			if (otherTypeTwo)// if other has a 2nd type and this has a 2nd
+									// type
+				re -= chart[other.type2][this.type2] + 1;
 		}
 
 		return re;
 	}
+
 
 }
