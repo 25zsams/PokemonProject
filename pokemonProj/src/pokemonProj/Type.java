@@ -131,19 +131,19 @@ public int compareTo(Type other) {
 				re += chart[this.type2][other.type2] - 1;
 		}
 		
-		//comparing other against this
+				//comparing other against this
 		
-		re -= chart[other.type1][this.type1] + 1;
+		re -= chart[other.type1][this.type1] - 1;
 
 		if (otherTypeTwo)// if this other a 2nd type
-			re -= chart[other.type2][this.type1] + 1;
+			re -= chart[other.type2][this.type1] - 1;
 
 		if (thisTypeTwo)// if this has a 2nd type
 		{
-			re -= chart[other.type1][this.type2] + 1;
+			re -= chart[other.type1][this.type2] - 1;
 			if (otherTypeTwo)// if other has a 2nd type and this has a 2nd
 									// type
-				re -= chart[other.type2][this.type2] + 1;
+				re -= chart[other.type2][this.type2] - 1;
 		}
 
 		return re;
