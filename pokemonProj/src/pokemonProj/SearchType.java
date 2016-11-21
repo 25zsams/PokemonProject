@@ -12,7 +12,7 @@ public class SearchType
 		   public void run()
 		   {
 			   JFrame jf = new JFrame("PokeGoBDB");	 
-		       jf.setSize(1000, 750);
+		       jf.setSize(1600, 900);
 		       jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		       jf.setLocationRelativeTo(null);
 		       jf.getContentPane().add(new SearchPanel());

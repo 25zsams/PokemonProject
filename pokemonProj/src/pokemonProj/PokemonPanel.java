@@ -1,26 +1,11 @@
 package pokemonProj;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Scanner;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 public class PokemonPanel extends JPanel
 {
@@ -32,7 +17,9 @@ public class PokemonPanel extends JPanel
 	private int SCROLL;
 	int up = 0, down = 0;
 	
-	JComboBox list, listType, surf;
+	JComboBox list, surf;
+	JButton help_button;
+	
 	HashMap<String, Type> pokemon = new HashMap<String, Type>();
 	String[] pokeName123 = new String[NUMOFPOKEMON];
 	String[] pokeNameABC = new String[NUMOFPOKEMON];
@@ -41,21 +28,226 @@ public class PokemonPanel extends JPanel
 	Icon[] picture = new ImageIcon[NUMOFPOKEMON];
 	JLabel[] picLabel = new JLabel[NUMOFPOKEMON];//this label holds graphical pictures
 	JLabel[] pokeNameLabel = new JLabel[NUMOFPOKEMON];//this label holds string names of pokemon
+	JPanel[] pokePanel = new JPanel[NUMOFPOKEMON];//this panel holds pokemon name and picture
 	JLabel selectedPokemon = new JLabel();//will hold the selected pokemon name
 	JLabel selectedType = new JLabel();//will hold the type of the selected pokemon
 	JLabel selectedPicture = new JLabel();
 	JLabel info = new JLabel();
+	JLabel title = new JLabel("Effectiveness Chart");
 	int[] stats = new int[NUMOFPOKEMON];
 	Font fontSize = new Font("Courier New", 1, 26);
-	boolean backGround = false;
 	
 	String filePath = new File("").getAbsolutePath();
 	String directory = filePath.concat("\\pokemon_data.txt");
 	String image_dir = filePath.concat("\\go sprites resized_100x100\\");
+	String help_file = filePath.concat("\\help_file.txt");
+	
+	Border lineBorder = BorderFactory.createLineBorder(Color.black,3);
+	Border lineBorder_thick = BorderFactory.createLineBorder(Color.black,6);
+	JPanel pokeInPanel;
+	JPanel pokeOutPanel;
+	JPanel left_PokePanel;
+	JPanel right_PokePanel;
+	JPanel titlePanel;
+	
+	Color light_green = new Color(144,238,144);// background color for the "Good Against" chart
+	Color light_red = new Color(255,99,71);// background color for the "Bad Against" chart
+	Color light_blue = new Color(176,196,222);// // background color for the Pokemon info box
 	
 	public PokemonPanel()
 	{
+		// calling the private setup function
+		setup();
 		
+		/*MissingNoListener missingNo = new MissingNoListener();
+		String M[] = {"Surf Up", "Surf Down"};
+		surf = new JComboBox(M);
+		surf.addActionListener(missingNo);
+		surf.setBounds(700, 100, 100, 20);*/
+		
+		// setting up the title 'Effectiveness'
+		setLayout(new BorderLayout());
+		title.setFont(new Font("SansSerif", Font.BOLD + Font.ITALIC, 31));
+		title.setToolTipText("Effectiveness");
+		title.setHorizontalAlignment(JLabel.CENTER);
+	    title.setVerticalAlignment(JLabel.CENTER);
+	    
+	    // setting up the help button
+	    help_button = new JButton("Help");
+		help_button.setFont(new Font("SansSerif", Font.BOLD, 20));
+		help_button.setToolTipText("POkeGoBDB Help");
+		help_button.addActionListener(new java.awt.event.ActionListener() 
+		{
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) 
+            {
+            	try 
+            	{
+            		// read the text from the help file and display it in the pop-up dialog window
+					String help_text = readHelp(help_file);
+					JOptionPane.showMessageDialog(frame, help_text,"PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE);
+				} 
+            	catch (IOException e) 
+            	{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					// if the help file is missing or unreadable show a generic message in dialog window
+					JOptionPane.showMessageDialog(frame, "About PokeGoDBD","PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE);
+				}
+            	repaint();
+            }
+        });
+	    
+	    titlePanel = new JPanel();
+	    GridLayout title_grid = new GridLayout(1,5);
+	    titlePanel.setLayout(title_grid);
+	    titlePanel.add(new JPanel());
+	    titlePanel.add(new JPanel());
+	    titlePanel.add(title);
+	    titlePanel.add(new JPanel());
+	    //titlePanel.add(surf);
+	    titlePanel.add(help_button);
+	    titlePanel.setLayout(title_grid);
+	    titlePanel.setBorder(new EmptyBorder(20, 75, 20, 75));
+		add(titlePanel, BorderLayout.NORTH);
+		
+		Arrays.sort(pokeNameABC);
+		list = new JComboBox(pokeNameABC);//stores Pokemon names in the drop box.
+		list.setToolTipText("Select a Pokemon");
+		Plistener listener = new Plistener();
+		list.addActionListener(listener);
+		//list.setBounds(650, 30, 125, 20);
+
+		//selectedPokemon.setBounds(650, 210, 150, 20);//holds the name of the selected pokemon
+		//selectedType.setBounds(650, 230, 150, 20);//holds the type of the selected pokemon type
+		//selectedPicture.setBounds(650, 100, 110, 110);
+		//info.setBounds(640, 0, 200, 20);
+		info.setFont(new Font("SansSerif", Font.BOLD, 20)); 
+		info.setText("Select a Pokemon:");
+		info.setBorder(new EmptyBorder(20, 20, 20, 20));
+		
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BorderLayout());
+		
+		JPanel selectPanel = new JPanel();
+		selectPanel.setLayout(new FlowLayout());
+		selectPanel.add(info);//add the 'Select a Pokemon' label
+		selectPanel.add(list);//add the JComboBox
+		mainPanel.add(selectPanel, BorderLayout.NORTH);
+		
+		JPanel subPanel = new JPanel();
+		subPanel.setLayout(new BorderLayout());
+		
+		JPanel topPanel = new JPanel();
+		topPanel.setLayout(new GridLayout(1,5));
+		
+		pokeOutPanel = new JPanel();
+		pokeOutPanel.setLayout(new FlowLayout());
+		//pokeOutPanel.setBorder(lineBorder_thick);
+		
+		// setting up the GUI for the Pokemon info box
+		pokeInPanel = new JPanel();
+		pokeInPanel.setLayout(new BorderLayout());
+		pokeInPanel.add(selectedPicture, BorderLayout.CENTER);
+		selectedPokemon.setFont(new Font("SansSerif", Font.BOLD, 18));
+		selectedPokemon.setBorder(new EmptyBorder(0, 15, 0, 0));
+		pokeInPanel.add(selectedPokemon, BorderLayout.SOUTH);
+		pokeOutPanel.add(pokeInPanel);
+		selectedType.setFont(new Font("SansSerif", Font.BOLD, 15));
+		selectedType.setBorder(new EmptyBorder(0, 25, 0, 0));
+		pokeOutPanel.add(selectedType);
+		topPanel.add(new JPanel());
+		topPanel.add(new JPanel());
+		topPanel.add(pokeOutPanel);
+		topPanel.add(new JPanel());
+		topPanel.add(new JPanel());
+		subPanel.add(topPanel, BorderLayout.NORTH);
+		
+		JPanel effPanel = new JPanel();
+		effPanel.setLayout(new GridLayout(1,2));
+		
+		JPanel leftPanel = new JPanel();
+		leftPanel.setLayout(new BorderLayout());
+		
+		JPanel rightPanel = new JPanel();
+		rightPanel.setLayout(new BorderLayout());
+		
+		// setting up the "Good Against" label
+		JLabel eff_leftLabel = new JLabel("Good Against");
+		eff_leftLabel.setToolTipText("Good Against");
+		eff_leftLabel.setFont(new Font("SansSerif", Font.BOLD, 35));
+		eff_leftLabel.setHorizontalAlignment(JLabel.CENTER);
+		eff_leftLabel.setVerticalAlignment(JLabel.TOP);
+		eff_leftLabel.setBorder(new EmptyBorder(10, 0, 10, 0));
+		leftPanel.add(eff_leftLabel, BorderLayout.NORTH);
+		
+		// setting up the "Bad Against" label
+		JLabel eff_rightLabel = new JLabel("Bad Against");
+		eff_rightLabel.setToolTipText("Bad Against");
+		eff_rightLabel.setFont(new Font("SansSerif", Font.BOLD, 35));
+		eff_rightLabel.setHorizontalAlignment(JLabel.CENTER);
+		eff_rightLabel.setVerticalAlignment(JLabel.TOP);
+		eff_rightLabel.setBorder(new EmptyBorder(10, 0, 10, 0));
+		rightPanel.add(eff_rightLabel, BorderLayout.NORTH);
+		
+		// setting up the left panel where the "Good Against" chart will be displayed
+		left_PokePanel = new JPanel();
+		left_PokePanel.setLayout(new FlowLayout());
+		left_PokePanel.setBackground(light_green);
+		leftPanel.setBackground(light_green);
+		leftPanel.setBorder(lineBorder);
+		leftPanel.add(left_PokePanel, BorderLayout.CENTER);
+		
+		// setting up the right panel where the "Bad Against" chart will be displayed
+		right_PokePanel = new JPanel();
+		right_PokePanel.setLayout(new FlowLayout());
+		right_PokePanel.setBackground(light_red);
+		rightPanel.setBackground(light_red);
+		rightPanel.setBorder(lineBorder);
+		rightPanel.add(right_PokePanel, BorderLayout.CENTER);
+		
+		// adding the "Good Against" and "Bad Against" charts to a larger panel
+		effPanel.add(leftPanel);
+		effPanel.add(rightPanel);
+		effPanel.setBorder(lineBorder);
+		
+		subPanel.add(effPanel, BorderLayout.CENTER);
+		
+		mainPanel.add(subPanel, BorderLayout.CENTER);
+		
+		add(mainPanel,BorderLayout.CENTER);
+		
+	    setPreferredSize(new Dimension(1600,800));
+	    setBackground(Color.white);
+	    //add(surf);
+	        
+	}
+	
+	// function to open and read the text from the help file
+	private String readHelp(String fileName) throws IOException 
+	{
+	    BufferedReader br = new BufferedReader(new FileReader(fileName));
+	    try 
+	    {
+	        StringBuilder sb = new StringBuilder();
+	        String line = br.readLine();
+
+	        while (line != null) 
+	        {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = br.readLine();
+	        }
+	        return sb.toString();
+	    } 
+	    finally 
+	    {
+	        br.close();
+	    }
+	}
+	
+	private void setup()
+	{	
 		Scanner pkmnIn = null;
 		
 		try 
@@ -68,6 +260,7 @@ public class PokemonPanel extends JPanel
 			e.printStackTrace();
 		}
 		
+		// reading in the data from the pokemon_data.txt file
 		String[] currentPkmn;
 		int counter = 0;
 		while(pkmnIn.hasNextLine())
@@ -86,87 +279,35 @@ public class PokemonPanel extends JPanel
 			{
 				pokemon.put(currentPkmn[0], new Type(currentPkmn[1]));
 			}
-			
-
 			counter++;
 		}
 		
-		Type reuseType = new Type("null");//just need a Type object to reuse its Strings[]
-		Arrays.sort(pokeNameABC);
-		list = new JComboBox(pokeNameABC);//stores Pokemons names and stats them in the drop box.
-		listType = new JComboBox(reuseType.getTYPES());
-		
-		
 		for(int i = 0; i < NUMOFPOKEMON; i++)
 		{
+			// assign each label a Pokemon name in 123 order.
 			pokeNameLabel[i] = new JLabel(pokeName123[i]);
-		}// assign each label a Pokemon name in 123 order.
+			pokeNameLabel[i].setBorder(new EmptyBorder(0, 15, 0, 0));
+			pokeNameLabel[i].setFont(new Font("SansSerif", Font.BOLD, 16));
 		
-		
-		//NEED PICTURE FILES
-		for(int x = 0; x < NUMOFPOKEMON; x++)
-		{
-			picLabel[x] = new JLabel(new ImageIcon(image_dir + pokeName123[x] + ".png"));
-			picLabel[x].setToolTipText("Type:"+pokemon.get(pokeName123[x]));
-		}//attach jpg or png file on to Icon picture, then place all the pictures on to a JLabel
-		
-
-		selectedPokemon.setBounds(650, 310, 150, 20);//holds the name of the selected pokemon
-		selectedType.setBounds(650, 330, 150, 20);//holds the name of the seelected pokemon type
-		selectedPicture.setBounds(650, 200, 110, 110);
-		info.setBounds(640, 0, 200, 20);
-		info.setText("Search by Name or Type");
-		add(selectedPicture);
-		add(selectedType);
-		add(selectedPokemon);
-
-		MissingNoListener missingNo = new MissingNoListener();
-		String M[] = {"Surf Up", "Surf Down"};
-		surf = new JComboBox(M);
-		Plistener listener = new Plistener();
-		TypeListener typeListener = new TypeListener();
-		list.addActionListener(listener);
-		list.setBounds(650, 30, 125, 20);
-		listType.setBounds(650, 60, 125, 20);
-		listType.addActionListener(typeListener);//listener for type search
-		surf.addActionListener(missingNo);
-		surf.setBounds(700, 100, 100, 1);
-	    setPreferredSize(new Dimension(1500,700));
-	    setBackground(Color.gray);
-	    add(list);//add the JComboBox
-	    add(listType);
-	    add(surf);
-	    add(info);
-	        
+			//NEED PICTURE FILES
+			//attach jpg or png file on to Icon picture, then place all the pictures on to a JLabel
+			picLabel[i] = new JLabel(new ImageIcon(image_dir + pokeName123[i] + ".png"));
+			picLabel[i].setToolTipText("Type:"+pokemon.get(pokeName123[i]));
+			
+			// creating the individual Pokemon panels containing their image and name
+			pokePanel[i] = new JPanel();
+			pokePanel[i].setLayout(new BorderLayout());
+			pokePanel[i].add(pokeNameLabel[i],BorderLayout.SOUTH);
+			pokePanel[i].add(picLabel[i],BorderLayout.CENTER);
+		}
 	}
 	
 	public void paintComponent(Graphics background)
 	{
 		super.paintComponent(background);	
-		if(backGround == true)
-		{
-			background.setColor(Color.CYAN);
-			background.fillRect(170, 100, 1050, 580);
-		}
-		
-		else
-		{
-			background.setColor(Color.blue);
-			background.drawLine(50, 50, 1000, 700);
-			background.drawOval(500, 500, 100, 100);
-			background.fillOval(300, 300, 200, 200);
-			background.fillRect(100, 100, 2001, 200);
-	
-			//do not insert background after THIS line.
-			background.setColor(Color.green);
-			background.setFont(fontSize);
-			background.drawString("Effective Against", 130, 50);
-			background.fillRect(15, 80, 500, 130 + SCROLL * 140);	
-			background.setColor(Color.red);
-			background.drawString("Ineffective Against", 1040, 50);
-			background.fillRect(946, 80, 500, 130 + SCROLL * 140);
-		}
-//		repaint();
+		//background.setFont(new Font("SansSerif", Font.BOLD, 30)); 
+		//background.drawString("Effective Against", 130, 50);
+		//background.drawString("Ineffective Against", 1040, 50);
 	}
 
 	private void setSCROLL(int _x)
@@ -174,23 +315,24 @@ public class PokemonPanel extends JPanel
 		SCROLL = _x;
 	}//seems like direct changes made to SCROLL in the ActionListener doesn't permeate to the paintComponent.
 	
-	private void setBackGround(boolean x)
+    // function to remove all the previous pokemon from the charts when a new action is taken in the drop-down
+	private void remove_pokemon()
 	{
-		backGround = x;
+		for(int p = 0; p < NUMOFPOKEMON; p++)
+		{
+			left_PokePanel.remove(pokePanel[p]);//always reset and remove label when starting new action.
+			right_PokePanel.remove(pokePanel[p]);//always reset and remove label when starting new action.
+			repaint();
+		}
+		
 	}
-
 	public class Plistener implements ActionListener
 	{
 		public void actionPerformed(ActionEvent e)
 		{
 			String s = list.getSelectedItem().toString();//takes the string entry of the JComboBox
 			
-			for(int p = 0; p < NUMOFPOKEMON; p++)
-			{
-				remove(pokeNameLabel[p]);//always reset and remove label when starting new action.
-				remove(picLabel[p]);//always reset and remove the picture when starting a new action.
-			}
-			
+			remove_pokemon();
 
 			for(int i = 0; i < NUMOFPOKEMON; i++)
 			{
@@ -198,11 +340,15 @@ public class PokemonPanel extends JPanel
 			}//assigned every compared pokemon a number -3<0<3
 			
 			
-			
-			String x = pokemon.get(s).toString();//out puts the attributes of the selected pokemon
-			selectedPokemon.setText("Pokemon:	 " + s);
-			selectedType.setText("Type: 	" + x);
+			//pokeOutPanel.setBorder(lineBorder_thick);
+			pokeOutPanel.setBorder(BorderFactory.createMatteBorder(6, 6, 0, 6, Color.BLACK));
+			pokeOutPanel.setBackground(light_blue);
+			pokeInPanel.setBackground(light_blue);
+			String x = pokemon.get(s).toString();//output the attributes of the selected pokemon
+			selectedPokemon.setText(s);
+			selectedType.setText("TYPE: 	" + x);
 			selectedPicture.setIcon(new ImageIcon(image_dir + s + ".png"));
+			selectedPicture.setToolTipText(selectedPokemon.getText());
 	
 			int j = 0;
 			int k = 0;
@@ -215,8 +361,8 @@ public class PokemonPanel extends JPanel
 				}//go to the next row and start from the most left column
 				if(stats[i] > 0)
 				{
-					add(pokeNameLabel[i]);
-					add(picLabel[i]);
+					pokePanel[i].setBackground(light_green);
+					left_PokePanel.add(pokePanel[i]);
 					pokeNameLabel[i].setBounds(20 + 100 * j, 200 + 130 * k, SIZE, 20);
 					picLabel[i].setBounds(20 + 100 * j, 120 + 130 * k, SIZE+10, SIZE);
 					pokeNameLabel[i].setHorizontalAlignment(SwingConstants.CENTER);
@@ -235,8 +381,8 @@ public class PokemonPanel extends JPanel
 				}//go to the next row and start from the most left column
 				if(stats[i] < 0)
 				{
-					add(pokeNameLabel[i]);
-					add(picLabel[i]);
+					pokePanel[i].setBackground(light_red);
+					right_PokePanel.add(pokePanel[i]);
 					pokeNameLabel[i].setBounds(950 + 100 * j2, 200 + 130 * k2, SIZE, 20);
 					picLabel[i].setBounds(950 + 100 * j2, 120 + 130 * k2, SIZE+10, SIZE);
 					pokeNameLabel[i].setHorizontalAlignment(SwingConstants.CENTER);
@@ -255,13 +401,12 @@ public class PokemonPanel extends JPanel
 			setPreferredSize(new Dimension(1500 + 1,700 + SCROLL * 100));
 			frame.setSize(frame.getSize().width, frame.getSize().height+ SCROLL * 100);
 			setSCROLL(SCROLL);//dynamic background depends on the # of pokemons displayed
-			setBackGround(false);
 			repaint();
 		}
 	}
 	
 
-	public class MissingNoListener implements ActionListener
+	/*public class MissingNoListener implements ActionListener
 	{
 		public void actionPerformed(ActionEvent e)
 		{
@@ -272,7 +417,6 @@ public class PokemonPanel extends JPanel
 			{
 				remove(list);
 				remove(surf);
-				remove(listType);
 				selectedPokemon.setText("MissingNo: ???");
 				selectedType.setText("Type: Normal,Bird");
 				selectedPicture.setIcon(new ImageIcon(image_dir+"MissingNo.png"));
@@ -284,58 +428,6 @@ public class PokemonPanel extends JPanel
 			}
 			repaint();
 		}
-	}
-
-	public class TypeListener implements ActionListener{
-		public void actionPerformed(ActionEvent e) 
-		{
-			String s2 = listType.getSelectedItem().toString();
-			if(selectedPokemon.getText().isEmpty())
-			{
-				
-			}
-			else
-			{
-				selectedPokemon.setText("");//isEmpty will nullpointer if setText becomes null;
-				selectedType.setText(null);
-				selectedPicture.setIcon(null);
-			}
-				
-			
-			for(int p = 0; p < NUMOFPOKEMON; p++)
-			{
-				remove(pokeNameLabel[p]);//always reset and remove label when starting new action.
-				remove(picLabel[p]);//always reset and remove the picture when starting a new action.
-			}
-		
-			int j = 0;
-			int k = 0;
-			for(int i = 0; i < NUMOFPOKEMON; i++)
-			{
-				if(j % 10 == 0 && j !=0)
-				{
-					j = 0;
-					k++;
-				}//go to the next row and start from the most left column
-				if(pokeType123[i].contains(s2))
-				{
-					add(pokeNameLabel[i]);
-					add(picLabel[i]);
-					pokeNameLabel[i].setBounds(200 + 100 * j, 200 + 130 * k, SIZE, 20);
-					picLabel[i].setBounds(200 + 100 * j, 120 + 130 * k, SIZE+10, SIZE);
-					pokeNameLabel[i].setHorizontalAlignment(SwingConstants.CENTER);
-					j++;
-				}
-			}//display pokemon on the left side
-			
-			
-			setBackGround(true);
-			repaint();
-		}
-		
-	}
-
-	
-	
+	}*/
 	
 }
