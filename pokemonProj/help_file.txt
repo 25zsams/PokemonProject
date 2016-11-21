@@ -1,0 +1,43 @@
+PokéGoBDB User Guide
+PokéGoBDB, short for Pokémon Go Battle Database, is an informative software for Pokémon Go players.  It has the following features:
+	A. Effectiveness Chart - For a particular Pokémon, you can find out which Pokémon are good against it and bad against it during battle.
+	B. Search by Type - You can search for Pokémon by their type(s).
+The program only covers the 151 Pokémon contained in Pokémon Go.
+
+A. How to use the ‘Effectiveness Chart’
+1. The Effectiveness Chart is the first screen that appears when the program is opened.
+2. At the top center of the screen is a drop-down list with the 151 Pokémon from Pokémon Go in alphabetical order.  Select a Pokémon from the drop-down.
+3. After selecting a Pokémon from the drop-down, a small info box below the drop-down will appear containing the image of the selected Pokémon, it’s name, and type(s).
+The Pokémon that are good against and bad against that selected Pokémon will be instantly displayed in the corresponding ‘Good Against’ and ‘Bad Against’ charts below the info box. 
+Moving the mouse over the image of any of the Pokémon in the two charts will bring up a small pop-up containing the type information for that Pokémon.
+4. Selecting a different Pokémon from the drop-down will instantly update the small info box and the ‘Good Against’ and ‘Bad Against’ charts.
+
+B. How to ‘Search by Type’
+1. The ‘Search by Type’ feature opens when you click on the ‘Search by Type’ tab on the top-left of the screen.
+2. Select the type(s) from the two drop-downs and click the ‘Search’ button to search for Pokémon that matches those type(s).
+     I. Select ‘none’ from the second drop-down if you want to search for Pokémon that matches the first type and has no second type.
+     II. Select ‘does not matter’ from the second drop-down if you want to search for Pokémon that matches the first type regardless of if they have a second type or not.
+3. If the search is successful, the matching Pokémon will be displayed under the ‘Results’.  Moving the mouse over the image of any of the Pokémon in the search results will bring up a small pop-up containing the type information for that Pokémon. 
+If the search is unsuccessful, the message ‘No Matches Found!‘ will be displayed there instead.
+4. Selecting different type(s) from the two drop-downs and clicking the ‘Search’ button will update the search results to match the new search.
+
+C. How to switch between the ‘Effectiveness Chart’ feature and the ‘Search by type’ feature
+1.  There are two tabs at the top left of the screen: ‘Effectiveness’ and ‘Search by type’.  The current program feature you are in matches the tab that is currently selected  Click on a different tab to switch to that feature.
+
+D. How to access Help
+1.  Click on the ‘Help’ button at the top right of the screen to bring up the Help pop-up window.  The Help window contains the User Guide and FAQ for the program.
+
+
+FAQ
+1. What is PokéGoBDB?
+PokéGoBDB is an informative software that assists the user in identifying the type of specific Pokémon as well as the effectiveness of a specific Pokémon relative to other Pokémon.  The program also allows the user to search for Pokémon by type.
+
+2. How does attribute/type work?
+Every Pokémon has one or two elemental attributes that are unique to their own species. These attributes are part of what defines the various species of  Pokémon. This means that every Pokémon of the same species are the same type.
+	
+3. What makes a certain Pokémon good or bad against other Pokémon?	
+In a Pokémon battle, an 'attack' does either more damage, less damage or normal damage to another Pokémon. This software compares all the necessary attributes associated to that species of Pokémon to decide if one Pokémon is effective against another.  
+Like the game "Rock, Paper, Scissors," a certain type is effective against another type.
+
+4. How is Magikarp good against anything?
+PokéGoBDB focuses only in the type of a Pokémon. It does not include dynamic factors such as level, abilities, Combat Power (CP), or characteristics.
