@@ -24,9 +24,6 @@ If the search is unsuccessful, the message ‘No Matches Found!‘ will be displayed
 C. How to switch between the ‘Effectiveness Chart’ feature and the ‘Search by type’ feature
 1.  There are two tabs at the top left of the screen: ‘Effectiveness’ and ‘Search by type’.  The current program feature you are in matches the tab that is currently selected  Click on a different tab to switch to that feature.
 
-D. How to access Help
-1.  Click on the ‘Help’ button at the top right of the screen to bring up the Help pop-up window.  The Help window contains the User Guide and FAQ for the program.
-
 
 FAQ
 1. What is PokéGoBDB?
