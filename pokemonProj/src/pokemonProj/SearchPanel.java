@@ -103,8 +103,13 @@ public class SearchPanel extends JPanel
             {
             	try 
             	{
+            		// read the text from the help file and display it in the pop-up dialog window
 					String help_text = readHelp(help_file);
-					JOptionPane.showMessageDialog(frame, help_text,"PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE);
+					ImageIcon logo = new ImageIcon("logo_vertical.png");
+					Image image = logo.getImage(); 
+					Image newimg = image.getScaledInstance(131, 126,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+					logo = new ImageIcon(newimg);
+					JOptionPane.showMessageDialog(frame, help_text,"PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
 				} 
             	catch (IOException e) 
             	{

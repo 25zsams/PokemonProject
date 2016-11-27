@@ -59,16 +59,16 @@ public class PokemonPanel extends JPanel
 		// calling the private setup function
 		setup();
 		
-		/*MissingNoListener missingNo = new MissingNoListener();
+		MissingNoListener missingNo = new MissingNoListener();
 		String M[] = {"Surf Up", "Surf Down"};
 		surf = new JComboBox(M);
 		surf.addActionListener(missingNo);
-		surf.setBounds(700, 100, 100, 20);*/
+		surf.setBounds(700, 100, 100, 20);
 		
 		// setting up the title 'Effectiveness'
 		setLayout(new BorderLayout());
 		title.setFont(new Font("SansSerif", Font.BOLD + Font.ITALIC, 31));
-		title.setToolTipText("Effectiveness");
+		title.setToolTipText("Effectiveness Chart");
 		title.setHorizontalAlignment(JLabel.CENTER);
 	    title.setVerticalAlignment(JLabel.CENTER);
 	    
@@ -85,7 +85,11 @@ public class PokemonPanel extends JPanel
             	{
             		// read the text from the help file and display it in the pop-up dialog window
 					String help_text = readHelp(help_file);
-					JOptionPane.showMessageDialog(frame, help_text,"PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE);
+					ImageIcon logo = new ImageIcon("logo_vertical.png");
+					Image image = logo.getImage(); 
+					Image newimg = image.getScaledInstance(131, 126,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+					logo = new ImageIcon(newimg);
+					JOptionPane.showMessageDialog(frame, help_text,"PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
 				} 
             	catch (IOException e) 
             	{
@@ -101,11 +105,17 @@ public class PokemonPanel extends JPanel
 	    titlePanel = new JPanel();
 	    GridLayout title_grid = new GridLayout(1,5);
 	    titlePanel.setLayout(title_grid);
+	    //titlePanel.add(surf);
+		/*ImageIcon logo = new ImageIcon("logo_horizontal.png");
+		Image image = logo.getImage(); 
+		Image newimg = image.getScaledInstance(207, 50,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+		logo = new ImageIcon(newimg);
+		JLabel picLabel = new JLabel(logo);
+		titlePanel.add(picLabel);*/
 	    titlePanel.add(new JPanel());
 	    titlePanel.add(new JPanel());
 	    titlePanel.add(title);
 	    titlePanel.add(new JPanel());
-	    //titlePanel.add(surf);
 	    titlePanel.add(help_button);
 	    titlePanel.setLayout(title_grid);
 	    titlePanel.setBorder(new EmptyBorder(20, 75, 20, 75));
@@ -406,7 +416,7 @@ public class PokemonPanel extends JPanel
 	}
 	
 
-	/*public class MissingNoListener implements ActionListener
+	public class MissingNoListener implements ActionListener
 	{
 		public void actionPerformed(ActionEvent e)
 		{
@@ -428,6 +438,6 @@ public class PokemonPanel extends JPanel
 			}
 			repaint();
 		}
-	}*/
+	}
 	
 }
