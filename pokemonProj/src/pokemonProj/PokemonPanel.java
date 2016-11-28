@@ -44,6 +44,7 @@ public class PokemonPanel extends JPanel
 	
 	Border lineBorder = BorderFactory.createLineBorder(Color.black,3);
 	Border lineBorder_thick = BorderFactory.createLineBorder(Color.black,6);
+	JPanel selectPanel;
 	JPanel pokeInPanel;
 	JPanel pokeOutPanel;
 	JPanel left_PokePanel;
@@ -63,7 +64,7 @@ public class PokemonPanel extends JPanel
 		String M[] = {"Surf Up", "Surf Down"};
 		surf = new JComboBox(M);
 		surf.addActionListener(missingNo);
-		surf.setBounds(700, 100, 100, 20);
+		surf.setPreferredSize(new Dimension(5, 1));
 		
 		// setting up the title 'Effectiveness'
 		setLayout(new BorderLayout());
@@ -81,23 +82,59 @@ public class PokemonPanel extends JPanel
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) 
             {
-            	try 
+            	if (Desktop.isDesktopSupported()) 
             	{
-            		// read the text from the help file and display it in the pop-up dialog window
-					String help_text = readHelp(help_file);
-					ImageIcon logo = new ImageIcon("logo_vertical.png");
+        		    try 
+        		    {
+        		    	// open the documentation pdf
+        		        File myFile = new File("CS177-proj1documentation.pdf");
+        		        Desktop.getDesktop().open(myFile);
+        		    } 
+        		    catch (Exception ex) 
+        		    {
+        		    	// no application registered for PDFs
+        		    	ImageIcon logo = new ImageIcon("logo_vertical.png");
+    					Image image = logo.getImage(); 
+    					Image newimg = image.getScaledInstance(131, 126,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+    					logo = new ImageIcon(newimg);
+        		    	try 
+                    	{
+                    		// read the text from the help file and display it in the pop-up dialog window
+        					String help_text = readHelp(help_file);
+        					JOptionPane.showMessageDialog(frame, help_text,"PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
+                    		
+        				} 
+                    	catch (IOException ioex) 
+                    	{
+        					// TODO Auto-generated catch block
+        					ioex.printStackTrace();
+        					// if the help file is missing or unreadable show a generic message in dialog window
+        					JOptionPane.showMessageDialog(frame, "Read the PokeGoBDB documentation pdf", "PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
+        				}
+        		        
+        		    }
+            	}
+            	else
+            	{
+            		ImageIcon logo = new ImageIcon("logo_vertical.png");
 					Image image = logo.getImage(); 
 					Image newimg = image.getScaledInstance(131, 126,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
 					logo = new ImageIcon(newimg);
-					JOptionPane.showMessageDialog(frame, help_text,"PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
-				} 
-            	catch (IOException e) 
-            	{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					// if the help file is missing or unreadable show a generic message in dialog window
-					JOptionPane.showMessageDialog(frame, "About PokeGoDBD","PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE);
-				}
+    		    	try 
+                	{
+                		// read the text from the help file and display it in the pop-up dialog window
+    					String help_text = readHelp(help_file);
+    					JOptionPane.showMessageDialog(frame, help_text, "PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
+                		
+    				} 
+                	catch (IOException ioex) 
+                	{
+    					// TODO Auto-generated catch block
+    					ioex.printStackTrace();
+    					// if the help file is missing or unreadable show a generic message in dialog window
+    					JOptionPane.showMessageDialog(frame, "Read the PokeGoBDB documentation pdf", "PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
+    				}
+        		}
             	repaint();
             }
         });
@@ -105,7 +142,6 @@ public class PokemonPanel extends JPanel
 	    titlePanel = new JPanel();
 	    GridLayout title_grid = new GridLayout(1,5);
 	    titlePanel.setLayout(title_grid);
-	    //titlePanel.add(surf);
 		/*ImageIcon logo = new ImageIcon("logo_horizontal.png");
 		Image image = logo.getImage(); 
 		Image newimg = image.getScaledInstance(207, 50,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
@@ -123,25 +159,27 @@ public class PokemonPanel extends JPanel
 		
 		Arrays.sort(pokeNameABC);
 		list = new JComboBox(pokeNameABC);//stores Pokemon names in the drop box.
-		list.setToolTipText("Select a Pokemon");
+		list.setToolTipText("Select a Pokémon");
 		Plistener listener = new Plistener();
 		list.addActionListener(listener);
+		list.setPreferredSize(new Dimension(150, 30));
 		//list.setBounds(650, 30, 125, 20);
 
 		//selectedPokemon.setBounds(650, 210, 150, 20);//holds the name of the selected pokemon
 		//selectedType.setBounds(650, 230, 150, 20);//holds the type of the selected pokemon type
 		//selectedPicture.setBounds(650, 100, 110, 110);
 		//info.setBounds(640, 0, 200, 20);
-		info.setFont(new Font("SansSerif", Font.BOLD, 20)); 
+		info.setFont(new Font("SansSerif", Font.BOLD, 24)); 
 		info.setText("Select a Pokemon:");
 		info.setBorder(new EmptyBorder(20, 20, 20, 20));
 		
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
 		
-		JPanel selectPanel = new JPanel();
+		selectPanel = new JPanel();
 		selectPanel.setLayout(new FlowLayout());
 		selectPanel.add(info);//add the 'Select a Pokemon' label
+		selectPanel.add(surf);
 		selectPanel.add(list);//add the JComboBox
 		mainPanel.add(selectPanel, BorderLayout.NORTH);
 		
@@ -408,9 +446,9 @@ public class PokemonPanel extends JPanel
 			}
 			else
 				SCROLL = k2;
-			setPreferredSize(new Dimension(1500 + 1,700 + SCROLL * 100));
+			setPreferredSize(new Dimension(1500 + 1,500 + SCROLL * 100));
 			frame.setSize(frame.getSize().width, frame.getSize().height+ SCROLL * 100);
-			setSCROLL(SCROLL);//dynamic background depends on the # of pokemons displayed
+			setSCROLL(SCROLL);//dynamic background depends on the # of pokemon displayed
 			repaint();
 		}
 	}
@@ -425,15 +463,26 @@ public class PokemonPanel extends JPanel
 			if(s1 == "Surf Down")down++;
 			if(up > 10 && down  > 10)
 			{
-				remove(list);
-				remove(surf);
+				selectPanel.remove(surf);
+				selectPanel.remove(list);
+				titlePanel.remove(help_button);
+				pokeOutPanel.setBorder(BorderFactory.createMatteBorder(6, 6, 0, 6, Color.BLACK));
+				pokeOutPanel.setBackground(light_blue);
+				pokeInPanel.setBackground(light_blue);
 				selectedPokemon.setText("MissingNo: ???");
+				selectedPokemon.setBorder(new EmptyBorder(0, 5, 0, 0));
 				selectedType.setText("Type: Normal,Bird");
-				selectedPicture.setIcon(new ImageIcon(image_dir+"MissingNo.png"));
+				selectedType.setBorder(new EmptyBorder(0, 20, 0, 0));
+				ImageIcon missing = new ImageIcon(image_dir+"MissingNo.png");
+				Image m_image = missing.getImage(); 
+				Image newimg = m_image.getScaledInstance(133, 149,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+				missing = new ImageIcon(newimg);
+				selectedPicture.setIcon(missing);
+				selectedPicture.setToolTipText("MissingNo");
 				for(int p = 0; p < NUMOFPOKEMON; p++)
 				{
-					remove(pokeNameLabel[p]);
-					remove(picLabel[p]);
+					left_PokePanel.remove(pokePanel[p]);
+					right_PokePanel.remove(pokePanel[p]);
 				}
 			}
 			repaint();

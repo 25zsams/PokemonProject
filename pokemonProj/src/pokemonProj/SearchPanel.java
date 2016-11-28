@@ -101,22 +101,59 @@ public class SearchPanel extends JPanel
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) 
             {
-            	try 
+            	if (Desktop.isDesktopSupported()) 
             	{
-            		// read the text from the help file and display it in the pop-up dialog window
-					String help_text = readHelp(help_file);
-					ImageIcon logo = new ImageIcon("logo_vertical.png");
+        		    try 
+        		    {
+        		    	// open the documentation pdf
+        		        File myFile = new File("CS177-proj1documentation.pdf");
+        		        Desktop.getDesktop().open(myFile);
+        		    } 
+        		    catch (Exception ex) 
+        		    {
+        		    	// no application registered for PDFs
+        		    	ImageIcon logo = new ImageIcon("logo_vertical.png");
+    					Image image = logo.getImage(); 
+    					Image newimg = image.getScaledInstance(131, 126,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+    					logo = new ImageIcon(newimg);
+        		    	try 
+                    	{
+                    		// read the text from the help file and display it in the pop-up dialog window
+        					String help_text = readHelp(help_file);
+        					JOptionPane.showMessageDialog(frame, help_text, "PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
+                    		
+        				} 
+                    	catch (IOException ioex) 
+                    	{
+        					// TODO Auto-generated catch block
+        					ioex.printStackTrace();
+        					// if the help file is missing or unreadable show a generic message in dialog window
+        					JOptionPane.showMessageDialog(frame, "Read the PokeGoBDB documentation pdf", "PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
+        				}
+        		        
+        		    }
+            	}
+            	else
+            	{
+            		ImageIcon logo = new ImageIcon("logo_vertical.png");
 					Image image = logo.getImage(); 
 					Image newimg = image.getScaledInstance(131, 126,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
 					logo = new ImageIcon(newimg);
-					JOptionPane.showMessageDialog(frame, help_text,"PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
-				} 
-            	catch (IOException e) 
-            	{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					JOptionPane.showMessageDialog(frame, "About PokeGoDBD","PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE);
-				}
+    		    	try 
+                	{
+                		// read the text from the help file and display it in the pop-up dialog window
+    					String help_text = readHelp(help_file);
+    					JOptionPane.showMessageDialog(frame, help_text, "PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
+                		
+    				} 
+                	catch (IOException ioex) 
+                	{
+    					// TODO Auto-generated catch block
+    					ioex.printStackTrace();
+    					// if the help file is missing or unreadable show a generic message in dialog window
+    					JOptionPane.showMessageDialog(frame, "Read the PokeGoBDB documentation pdf", "PokeGoBDB Help", JOptionPane.INFORMATION_MESSAGE, logo);
+    				}
+        		}
             	repaint();
             }
         });
@@ -163,7 +200,8 @@ public class SearchPanel extends JPanel
 	    lType1.setVerticalAlignment(JLabel.CENTER);
 		lType1.setToolTipText("Type 1");
 		topleftPanel.add(lType1);
-		type1_dropdown = new JComboBox(typesArray1);
+		type1_dropdown = new JComboBox<String>(typesArray1);
+		type1_dropdown.setToolTipText("Select the 1st type of the Pokémon");
 		topleftPanel.add(type1_dropdown);
 		topleftPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 		
@@ -175,6 +213,7 @@ public class SearchPanel extends JPanel
 		lType2.setToolTipText("Type 2");
 		midleftPanel.add(lType2);
 		type2_dropdown = new JComboBox<String>(typesArray2);
+		type2_dropdown.setToolTipText("Select the 2nd type of the Pokémon");
 		midleftPanel.add(type2_dropdown);
 		midleftPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 		
